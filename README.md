@@ -55,7 +55,7 @@ virsorter run --seqname-suffix-off --viral-gene-enrich-off --provirus-off --prep
 ```
 > Note: if you obtain viral sequences from other tools and you want annotate your sequences with DRAM-v, you should also run Virsorter2 with --min-score set to 0 with above command. 
 
-### 7. Run DRAMv
+### 8. Run DRAMv
 Then run DRAMv to annotate the identified sequences, which can be used for manual curation. You can adjust the "--threads" option based on availability of CPU cores.
 ```
 # step 1 annotate
@@ -63,7 +63,7 @@ DRAM-v.py annotate -i vs2-pass2/for-dramv/final-viral-combined-for-dramv.fa -v v
 #step 2 summarize anntotations
 DRAM-v.py distill -i dramv-annotate/annotations.tsv -o dramv-distill
 ```
-### 8. Run HHblits
+### 9. Run HHblits
 According to my knowledge, some protein sequences of viruses cannot be annotated by traditional sequences alignment methods, so a more sensitive method needs to be introduced. We use the Profile-to-ptofile annotation method of HHblits, which can also be used in the [web version](https://toolkit.tuebingen.mpg.de/tools/hhpred), but unable to annotate multiple sequences.
 In brief, you can copy the following shell script in your environemnt and run with:
 ```
@@ -71,26 +71,22 @@ sh /mnt/storage14/duanchanghai/tools/hhblit.sh your_protein_file.faa
 ```
 The output file with suffix hhblit_annotation.tsv is the annotation file, you should carefully check the results with probability > 95 which need serious consideration (check the other hits in the list)
 
-### 9. Manual curation
+### 10. Manual curation
 
 For those in “manual check” category, you can look through their annotations in "dramv-annotate/annotations.tsv" and "hhblit_annotation.tsv" in which each gene of every contig is a line and has annotation from multiple databases. This step is hard to standardize, but below are some criteria based on our experience.
 
-Criteria for calling a contig viral:
-Structural genes, hallmark genes, depletion in annotations or enrichment for hypotheticals (~10% genes having non-hypothetical annotations)
-Lacking hallmarks but >=50% of annotated genes hit to a virus and at least half of those have viral bitcore >100 and the contig is <50kb in length
-Provirus: Integrase/recombinase/excisionase/repressor, enrichment of viral genes on one side
-Provirus: “break” in the genome: gap between two genes corresponding to a strand switch, higher coding density, depletion in annotations, and an enrichment for phage genes on one side
-Few annotations only ~1-3 genes, but with at least half hitting to viruses, and where the genes hitting cells have a bitscore no more than 150% that of the viral bitscores and/or viral bitscores are >100
-LPS (lipopolysaccharide) looking regions if also has very strong hits to viral genes bitscore > 100
+Criteria for calling a contig viral:  
+😁Structural genes, hallmark genes, depletion in annotations or enrichment for hypotheticals (~10% genes having non-hypothetical annotations)  
+😄Lacking hallmarks but >=50% of annotated genes hit to a virus and at least half of those have viral bitcore >100 and the contig is <50kb in length  
+😊Provirus: Integrase/recombinase/excisionase/repressor, enrichment of viral genes on one side （need further check out ）
+☺️Provirus: “break” in the genome: gap between two genes corresponding to a strand switch, higher coding density, depletion in annotations, and an enrichment for phage genes on one side  need further check out ）
 
-Criteria for callling a contig non-viral:
-/>3x cellular like genes than viral, nearly all genes annotated, no genes hitting to only viruses and no viral hallmark genes
-Lacking any viral hallmark genes and >50kb
-Strings of many obvious cellular genes, with no other viral hallmark genes. Examples encountered in our benchmarking include 1) CRISPR Cas, 2) ABC transporters, 3) Sporulation proteins, 4) Two-component systems, 5) Secretion system. Some of these may be encoded by viruses, but are not indicative of a viral contig without further evidence.
-Multiple plasmid genes or transposases but no clear genes hitting only to viruses
-Few annotations, only ~1-3 genes hitting to both viruses and cellular genes but with stronger bitscores for the cellular genes.
-LPS looking regions if no strong viral hits. Enriched in genes commonly associated with Lipopolysaccharide or LPS, such as epimerases, glycosyl transferases, acyltransferase, short-chain dehydrogenase/reductase, dehydratase
-Genes annotated as Type IV and/or Type VI secretion system surrounded by non-viral genes
-Few annotations, only ~1-3 genes all hitting to cellular genes (even if bitscore <100) with no viral hits
 
-Lastly, user beware that any provirus boundary predicted by VirSorter 2 and/or checkV is an approximate estimate only (calling “ends” is quite a challenging problem in prophage discovery), and needs to be manually inspected carefully too, especially for AMG studies.
+Criteria for callling a contig non-viral:  
+😫/>3x cellular like genes than viral, nearly all genes annotated, no genes hitting to only viruses and no viral hallmark genes  
+😩Lacking any viral hallmark genes and >50kb  
+😣Strings of many obvious cellular genes, with no other viral hallmark genes. Examples encountered in our benchmarking include 1) CRISPR Cas, 2) ABC transporters, 3) Sporulation proteins, 4) Two-component systems, 5) Secretion system. Some of these may be encoded by viruses, but are not indicative of a viral contig without further evidence.  
+😖Multiple plasmid genes or transposases but no clear genes hitting only to viruses  
+☹️Few annotations, only ~1-3 genes hitting to both viruses and cellular genes but with stronger bitscores for the cellular genes.  
+
+‼️Lastly, user beware that any provirus boundary predicted by VirSorter 2 and/or checkV is an approximate estimate only (calling “ends” is quite a challenging problem in prophage discovery), and needs to be manually inspected carefully too, especially for AMG studies.
