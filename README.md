@@ -46,5 +46,22 @@ Then we run the checkV-trimmed sequences through VirSorter2 again to generate "a
 cat checkv/proviruses.fna checkv/viruses.fna > checkv/combined.fna
 virsorter run --seqname-suffix-off --viral-gene-enrich-off --provirus-off --prep-for-dramv -i checkv/combined.fna -w vs2-pass2 --include-groups dsDNAphage,ssDNA --min-length 5000 --min-score 0.5 -j 28 all
 ```
-> Note: if you obtain viral sequences from other tools and you want annotate your sequences with DRAM-v, you should also run Virsorter2 with --min-score set to 0. 
+> Note: if you obtain viral sequences from other tools and you want annotate your sequences with DRAM-v, you should also run Virsorter2 with --min-score set to 0 with above command. 
+
+### 7. Run DRAMv
+Then run DRAMv to annotate the identified sequences, which can be used for manual curation. You can adjust the "--threads" option based on availability of CPU cores.
+```
+# step 1 annotate
+DRAM-v.py annotate -i vs2-pass2/for-dramv/final-viral-combined-for-dramv.fa -v vs2-pass2/for-dramv/viral-affi-contigs-for-dramv.tab -o dramv-annotate --skip_trnascan --threads 28 --min_contig_size 1000
+#step 2 summarize anntotations
+DRAM-v.py distill -i dramv-annotate/annotations.tsv -o dramv-distill
+```
+### 7. Run HHblits
+According to my knowledge, some protein sequences of viruses cannot be annotated by traditional sequences alignment methods, so a more sensitive method needs to be introduced. We use the Profile-to-ptofile annotation method of HHblits, which can also be used in the [web version](https://toolkit.tuebingen.mpg.de/tools/hhpred), but unable to annotate multiple sequences.
+In brief, you can copy the following shell script in your environemnt and run with:
+```
+sh /mnt/storage14/duanchanghai/tools/hhblit.sh your_protein_file.faa
+
+```
+
 
