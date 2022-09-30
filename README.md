@@ -45,6 +45,7 @@ checkv end_to_end vs2-pass1/final-viral-combined.fa checkv -t 28 -d /path/to/che
 > Here are some criteria for select the result form above procedures:  
 > Keep1: viral_gene >0  (please look at checkv result quality_summary.tsv)  
 > Keep2: viral_gene =0 AND (host_gene =0 OR score >=0.95 OR hallmark >2) (please look at vs2 result final-viral-score.tsv)  
+
 > Note: CheckV will identify the terminal repeats in the viral sequnces you provide, if they detect DTR(direct terminal repeats) or ITR(invert terminal repeats), they would write the reuslt in checkv/complete_genomes.tsv file in step 5. You need to carefully check these virus with circular or linear genome in the annotation files.
 
 ### 7. Run VirSorter2 again
