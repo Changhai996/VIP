@@ -40,8 +40,15 @@ There could be some non-viral sequences or regions in the VirSorter2 results wit
 ```
 checkv end_to_end vs2-pass1/final-viral-combined.fa checkv -t 28 -d /path/to/check_database/db/checkv-db-v1.0
 ```
-### 6. Run VirSorter2 again
-Then we run the checkV-trimmed sequences through VirSorter2 again to generate "affi-contigs.tab" files needed by DRAMv to identify AMGs. You can adjust the "-j" option based on the availability of CPU cores. Note the "--seqname-suffix-off" option preserves the original input sequence name since we are sure there is no chance of getting >1 proviruses from the same contig in this second pass, and the "--viral-gene-enrich-off" option turns off the requirement of having more viral genes than host genes to make sure that VirSorter2 is not doing any screening at this step. The above two options require VirSorter2 version >=2.2.1.
+### 6. Additional procedures (important)
+> First, you need to make sure they are viruses. To my knowledge, if you can not find a viral structure protein in viral sequences, they are most likely to be non-viral, because vs2 has a high false positive rate.
+> Here are some criteria for select the result form above procedures:  
+> Keep1: viral_gene >0  (please look at checkv result quality_summary.tsv)  
+> Keep2: viral_gene =0 AND (host_gene =0 OR score >=0.95 OR hallmark >2) (please look at vs2 result final-viral-score.tsv)  
+> Note: CheckV will identify the terminal repeats in the viral sequnces you provide, if they detect DTR(direct terminal repeats) or ITR(invert terminal repeats), they would write the reuslt in checkv/complete_genomes.tsv file in step 5. You need to carefully check these virus with circular or linear genome in the annotation files.
+
+### 7. Run VirSorter2 again
+Then we run the checkV-trimmed and filted sequences by step 6 through VirSorter2 again to generate "affi-contigs.tab" files needed by DRAMv to identify AMGs. You can adjust the "-j" option based on the availability of CPU cores. Note the "--seqname-suffix-off" option preserves the original input sequence name since we are sure there is no chance of getting >1 proviruses from the same contig in this second pass, and the "--viral-gene-enrich-off" option turns off the requirement of having more viral genes than host genes to make sure that VirSorter2 is not doing any screening at this step. The above two options require VirSorter2 version >=2.2.1.
 ``` 
 cat checkv/proviruses.fna checkv/viruses.fna > checkv/combined.fna
 virsorter run --seqname-suffix-off --viral-gene-enrich-off --provirus-off --prep-for-dramv -i checkv/combined.fna -w vs2-pass2 --include-groups dsDNAphage,ssDNA --min-length 5000 --min-score 0.5 -j 28 all
@@ -56,7 +63,7 @@ DRAM-v.py annotate -i vs2-pass2/for-dramv/final-viral-combined-for-dramv.fa -v v
 #step 2 summarize anntotations
 DRAM-v.py distill -i dramv-annotate/annotations.tsv -o dramv-distill
 ```
-### 7. Run HHblits
+### 8. Run HHblits
 According to my knowledge, some protein sequences of viruses cannot be annotated by traditional sequences alignment methods, so a more sensitive method needs to be introduced. We use the Profile-to-ptofile annotation method of HHblits, which can also be used in the [web version](https://toolkit.tuebingen.mpg.de/tools/hhpred), but unable to annotate multiple sequences.
 In brief, you can copy the following shell script in your environemnt and run with:
 ```
@@ -64,14 +71,26 @@ sh /mnt/storage14/duanchanghai/tools/hhblit.sh your_protein_file.faa
 ```
 The output file with suffix hhblit_annotation.tsv is the annotation file, you should carefully check the results with probability > 95 which need serious consideration (check the other hits in the list)
 
-### 8. Additional procedures (important)
-> First, you need to make sure they are viruses. To my knowledge, if you can not find a viral structure protein in viral sequences, they are most likely to be non-viral, because vs2 has a high false positive rate
+### 9. Manual curation
 
+For those in “manual check” category, you can look through their annotations in "dramv-annotate/annotations.tsv" and "hhblit_annotation.tsv" in which each gene of every contig is a line and has annotation from multiple databases. This step is hard to standardize, but below are some criteria based on our experience.
 
-8.1 Identifiy complete viral genome 
-CheckV will identify the terminal repeats in the viral sequnces you provide, if they detect DTR(direct terminal repeats) or ITR(invert terminal repeats), they would write the reuslt in checkv/complete_genomes.tsv file in step 5. You need to carefully check these virus with circular or linear genome in the annotation files.
+Criteria for calling a contig viral:
+Structural genes, hallmark genes, depletion in annotations or enrichment for hypotheticals (~10% genes having non-hypothetical annotations)
+Lacking hallmarks but >=50% of annotated genes hit to a virus and at least half of those have viral bitcore >100 and the contig is <50kb in length
+Provirus: Integrase/recombinase/excisionase/repressor, enrichment of viral genes on one side
+Provirus: “break” in the genome: gap between two genes corresponding to a strand switch, higher coding density, depletion in annotations, and an enrichment for phage genes on one side
+Few annotations only ~1-3 genes, but with at least half hitting to viruses, and where the genes hitting cells have a bitscore no more than 150% that of the viral bitscores and/or viral bitscores are >100
+LPS (lipopolysaccharide) looking regions if also has very strong hits to viral genes bitscore > 100
 
-8.2 Identifiy segmented viral genome 
-This is the most common situation, no matter they are contigs with viral protein or provirus, it is hard to distinguish viral region.
+Criteria for callling a contig non-viral:
+/>3x cellular like genes than viral, nearly all genes annotated, no genes hitting to only viruses and no viral hallmark genes
+Lacking any viral hallmark genes and >50kb
+Strings of many obvious cellular genes, with no other viral hallmark genes. Examples encountered in our benchmarking include 1) CRISPR Cas, 2) ABC transporters, 3) Sporulation proteins, 4) Two-component systems, 5) Secretion system. Some of these may be encoded by viruses, but are not indicative of a viral contig without further evidence.
+Multiple plasmid genes or transposases but no clear genes hitting only to viruses
+Few annotations, only ~1-3 genes hitting to both viruses and cellular genes but with stronger bitscores for the cellular genes.
+LPS looking regions if no strong viral hits. Enriched in genes commonly associated with Lipopolysaccharide or LPS, such as epimerases, glycosyl transferases, acyltransferase, short-chain dehydrogenase/reductase, dehydratase
+Genes annotated as Type IV and/or Type VI secretion system surrounded by non-viral genes
+Few annotations, only ~1-3 genes all hitting to cellular genes (even if bitscore <100) with no viral hits
 
-
+Lastly, user beware that any provirus boundary predicted by VirSorter 2 and/or checkV is an approximate estimate only (calling “ends” is quite a challenging problem in prophage discovery), and needs to be manually inspected carefully too, especially for AMG studies.
