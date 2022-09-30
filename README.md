@@ -78,8 +78,8 @@ For those in “manual check” category, you can look through their annotations
 Criteria for calling a contig viral:  
 😁Structural genes, hallmark genes, depletion in annotations or enrichment for hypotheticals (~10% genes having non-hypothetical annotations)  
 😄Lacking hallmarks but >=50% of annotated genes hit to a virus and at least half of those have viral bitcore >100 and the contig is <50kb in length  
-😊Provirus: Integrase/recombinase/excisionase/repressor, enrichment of viral genes on one side （need further check out ）
-☺️Provirus: “break” in the genome: gap between two genes corresponding to a strand switch, higher coding density, depletion in annotations, and an enrichment for phage genes on one side  need further check out ）
+😊Provirus: Integrase/recombinase/excisionase/repressor, enrichment of viral genes on one side （need further check out)  
+☺️Provirus: “break” in the genome: gap between two genes corresponding to a strand switch, higher coding density, depletion in annotations, and an enrichment for phage genes on one side  need further check out）
 
 
 Criteria for callling a contig non-viral:  
