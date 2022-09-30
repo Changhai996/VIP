@@ -83,7 +83,7 @@ Criteria for calling a contig viral:
 
 
 Criteria for callling a contig non-viral:  
-😫/>3x cellular like genes than viral, nearly all genes annotated, no genes hitting to only viruses and no viral hallmark genes  
+😫>3x cellular like genes than viral, nearly all genes annotated, no genes hitting to only viruses and no viral hallmark genes  
 😩Lacking any viral hallmark genes and >50kb  
 😣Strings of many obvious cellular genes, with no other viral hallmark genes. Examples encountered in our benchmarking include 1) CRISPR Cas, 2) ABC transporters, 3) Sporulation proteins, 4) Two-component systems, 5) Secretion system. Some of these may be encoded by viruses, but are not indicative of a viral contig without further evidence.  
 😖Multiple plasmid genes or transposases but no clear genes hitting only to viruses  
