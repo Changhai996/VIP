@@ -61,7 +61,17 @@ According to my knowledge, some protein sequences of viruses cannot be annotated
 In brief, you can copy the following shell script in your environemnt and run with:
 ```
 sh /mnt/storage14/duanchanghai/tools/hhblit.sh your_protein_file.faa
-
 ```
+The output file with suffix hhblit_annotation.tsv is the annotation file, you should carefully check the results with probability > 95 which need serious consideration (check the other hits in the list)
+
+### 8. Additional procedures (important)
+> First, you need to make sure they are viruses. To my knowledge, if you can not find a viral structure protein in viral sequences, they are most likely to be non-viral, because vs2 has a high false positive rate
+
+
+8.1 Identifiy complete viral genome 
+CheckV will identify the terminal repeats in the viral sequnces you provide, if they detect DTR(direct terminal repeats) or ITR(invert terminal repeats), they would write the reuslt in checkv/complete_genomes.tsv file in step 5. You need to carefully check these virus with circular or linear genome in the annotation files.
+
+8.2 Identifiy segmented viral genome 
+This is the most common situation, no matter they are contigs with viral protein or provirus, it is hard to distinguish viral region.
 
 
