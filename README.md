@@ -49,11 +49,11 @@ cut -f 1,6 quality_summary.tsv | sort -t $'\t' -k 2 -n | awk '$2>0 {print $1}' >
 ```
 > Keep2&3: viral_gene =0 AND (host_gene =0 OR score >=0.95 OR hallmark >2) (please look at vs2 result final-viral-score.tsv)  
 ```
-cut -f 1,6,7 quality_summary.tsv | sort -t $'\t' -k 2 -n | awk '$2<1&&$3==0 {print $0}' > keep2.txt 
+cut -f 1,6,7 quality_summary.tsv | sort -t $'\t' -k 2 -n | awk '$2<1&&$3==0 {print $1}' > keep2.txt 
 ```
 ```
 cut -f 1,6 quality_summary.tsv | sort -t $'\t' -k 2 -n | awk '$2<1 {print $1}' > viral_gene_zero.txt
-grep -wf viral_gene_zero.txt ../vs2-pass1/final-viral-score.tsv  | awk '$4>0.95 || $7>2 {print $0}' > keep3.txt 
+grep -wf viral_gene_zero.txt ../vs2-pass1/final-viral-score.tsv  | awk '$4>0.95 || $7>2 {print $1}' > keep3.txt 
 ```
 
 > Note: CheckV will identify the terminal repeats in the viral sequnces you provide, if they detect DTR(direct terminal repeats) or ITR(invert terminal repeats), they would write the reuslt in checkv/complete_genomes.tsv file in step 5. You need to carefully check these virus with circular or linear genome in the annotation files.
