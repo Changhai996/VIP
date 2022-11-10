@@ -62,7 +62,11 @@ grep -wf viral_gene_zero.txt ../vs2-pass1/final-viral-score.tsv  | awk '$4>0.95 
 Then we run the checkV-trimmed and filted sequences by step 6 through VirSorter2 again to generate "affi-contigs.tab" files needed by DRAMv to identify AMGs. You can adjust the "-j" option based on the availability of CPU cores. Note the "--seqname-suffix-off" option preserves the original input sequence name since we are sure there is no chance of getting >1 proviruses from the same contig in this second pass, and the "--viral-gene-enrich-off" option turns off the requirement of having more viral genes than host genes to make sure that VirSorter2 is not doing any screening at this step. The above two options require VirSorter2 version >=2.2.1.
 ``` 
 cat checkv/proviruses.fna checkv/viruses.fna > checkv/combined.fna
-virsorter run --seqname-suffix-off --viral-gene-enrich-off --provirus-off --prep-for-dramv -i checkv/combined.fna -w vs2-pass2 --include-groups dsDNAphage,ssDNA --min-length 5000 --min-score 0.5 -j 28 all
+cat keep1.txt keep2.txt keep3.txt | sort | uniq > keep
+grep -f keep combined.fna | sed 's/>//g' > keep_modified 
+awk 'NR==FNR{a[">"$0];next}/^>/{f=0;}($0 in a)||f{print;f=1}' keep_modified combined.fna > keep_modified.fa
+
+virsorter run --seqname-suffix-off --viral-gene-enrich-off --provirus-off --prep-for-dramv -i checkv/keep_modified.fa -w vs2-pass2 --include-groups dsDNAphage,ssDNA --min-length 5000 --min-score 0.5 -j 28 all
 ```
 > Note: if you obtain viral sequences from other tools and you want annotate your sequences with DRAM-v, you should also run Virsorter2 with --min-score set to 0 with above command. 
 
